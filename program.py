@@ -228,7 +228,6 @@ def toWaveData(jsonObj):
                 prop[1].fset(wave, value)
     return wave
 
-
 ######################################################################################################
 # The following define the identifiers we'll use throughout
 ######################################################################################################
@@ -245,18 +244,18 @@ try:
     config = configparser.ConfigParser()
     config.read('config.ini')
 
-    client = SdsClient(config.get('Access', 'Tenant'), config.get('Access', 'Address'), config.get('Credentials', 'Resource'), 
+    client = SdsClient(config.get('Access', 'Tenant'), config.get('Access', 'Address'), config.get('Credentials', 'Resource'),
                       config.get('Credentials', 'Authority'), config.get('Credentials', 'ClientId'), config.get('Credentials', 'ClientSecret'))
 
     namespaceId = config.get('Configurations', 'Namespace')
 
     print("------------------------------------------")
-    print("  _________    .___     __________        ")        
+    print("  _________    .___     __________        ")
     print(" /   _____/  __| _/_____\______   \___.__.")
     print(" \_____  \  / __ |/  ___/|     ___<   |  |")
     print(" /        \/ /_/ |\___ \ |    |    \___  |")
     print("/_______  /\____ /____  >|____|    / ____|")
-    print("        \/      \/    \/           \/     ")	
+    print("        \/      \/    \/           \/     ")
     print("------------------------------------------")
     print("Sds endpoint at {url}".format(url = client.Uri))
     print()
@@ -310,7 +309,7 @@ try:
     for wave in waves:
         print(toString(wave))
     print()
-    
+
     print("Updating events")
     # Update the first event
     event = nextWave(start, span, 4.0, 0)
@@ -335,7 +334,7 @@ try:
     # replace one value
     event = nextWave(start, span, 10.0, 0)
     client.replaceValue(namespaceId, stream.Id, event)
-    
+
     # replace multiple values
     replacedEvents = []
     for i in range(2, 40, 2):
@@ -353,19 +352,19 @@ try:
     ######################################################################################################
     # Property Overrides
     ######################################################################################################
-    
+
     print("Property Overrides")
     print("Sds can interpolate or extrapolate data at an index location where data does not explicitly exist:")
     print()
-    
-	# We will retrieve three events using the default behavior, Continuous
+
+    # We will retrieve three events using the default behavior, Continuous
     waves = client.getRangeValues(namespaceId, stream.Id, WaveData, "1", 0, 3, False, SdsBoundaryType.ExactOrCalculated)
 
     print("Default (Continuous) requesting data starting at index location '1', where we have not entered data, Sds will interpolate a value for each property:")
     for wave in waves:
         print(("Order: {order}: Radians: {radians} Cos: {cos}".format(order = wave.Order, radians = wave.Radians, cos = wave.Cos)))
 
-    # Create a Discrete stream PropertyOverride indicating that we do not want Sds to calculate a value for Radians and update our stream 
+    # Create a Discrete stream PropertyOverride indicating that we do not want Sds to calculate a value for Radians and update our stream
     propertyOverride = SdsStreamPropertyOverride()
     propertyOverride.SdsTypePropertyId = 'Radians'
     propertyOverride.InterpolationMode = 3
@@ -401,15 +400,15 @@ try:
     vp2 = SdsViewProperty()
     vp2.SourceId = "Sin"
     vp2.TargetId = "SinInt"
-    
+
     vp3 = SdsViewProperty()
     vp3.SourceId = "Cos"
     vp3.TargetId = "CosInt"
-    
+
     vp4 = SdsViewProperty()
     vp4.SourceId = "Tan"
     vp4.TargetId = "TanInt"
-    
+
     #Create a view mapping our original type to our target type, data shape is the same so let Sds handle the mapping
     view = SdsView()
     view.Id = sampleViewId
@@ -424,10 +423,10 @@ try:
     manualView.TargetTypeId = waveIntegerType.Id
     manualView.SourceTypeId = waveType.Id
     manualView.Properties = [vp1, vp2, vp3, vp4]
-    
+
     automaticView = client.getOrCreateView(namespaceId, view)
     manualView = client.getOrCreateView(namespaceId, manualView)
-    
+
     viewMap1 = SdsViewMap()
     viewMap1 = client.getViewMap(namespaceId, automaticView.Id)
 
@@ -458,7 +457,7 @@ try:
     print ("We can query Sds to return the SdsViewMap for our SdsView, here is the one generated automatically:")
     for prop in viewMap1.Properties:
         print(("{source} => {dest}".format(source = prop.SourceId, dest = prop.TargetId)))
-		
+
     print ()
     print ("Here is our explicit mapping, note SdsViewMap will return all properties of the Source Type, even those without a corresponding Target property:")
     for prop in viewMap2.Properties:

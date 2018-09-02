@@ -104,7 +104,8 @@ class WaveData:
 
         if len(content) == 0:
             return wave
-
+        z = inspect.getmembers(type(wave))
+        x = inspect.getmembers(type(wave), lambda v : isinstance(v, property))
         for prop in inspect.getmembers(type(wave), lambda v : isinstance(v, property)):
             # Pre-Assign the default
             prop[1].fset(wave, 0)

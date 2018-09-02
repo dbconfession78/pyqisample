@@ -108,14 +108,10 @@ class SdsClient(object):
             namespace_id=namespace_id,
             type_id=type.Id)
         payload = type.toJson()
-        print(payload)
         hdrs = self.__sdsHeaders()
-        print(hdrs)
         response = requests.post(
             url=req_url,
-            # self.__url + self.__typesPath.format(tenant_id=self.__tenant, namespace_id=namespace_id, type_id=type.Id),
             data=payload,
-            # headers=self.__sdsHeaders())
             headers=hdrs)
         if response.status_code < 200 or response.status_code >= 300:
             response.close()
@@ -535,9 +531,11 @@ class SdsClient(object):
         if end is None:
             raise TypeError
 
+        req_url = self.__url + self.__getWindowValues.format(tenant_id=self.__tenant, namespace_id=namespace_id,
+                                                       stream_id=stream_id, start=start, end=end, view_id=view_id)
+        print(req_url)
         response = requests.get(
-            self.__url + self.__getWindowValues.format(tenant_id=self.__tenant, namespace_id=namespace_id,
-                                                       stream_id=stream_id, start=start, end=end, view_id=view_id),
+            url=req_url,
             headers=self.__sdsHeaders())
         if response.status_code < 200 or response.status_code >= 300:
             response.close()
@@ -834,3 +832,4 @@ class SdsClient(object):
         self.__replaceValuesPath = self.__dataPath + "/ReplaceValues"
         self.__removeValue = self.__dataPath + "/RemoveValue?index={index}"
         self.__removeWindowValues = self.__dataPath + "/RemoveWindowValues?startIndex={start}&endIndex={end}"
+
